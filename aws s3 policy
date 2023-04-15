@@ -1,0 +1,17 @@
+{
+  "Id": "Policy1681437853851",
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Sid": "Stmt1681437848852",
+      "Action": "s3:*",
+      "Effect": "Allow",
+      "Resource": "arn:aws:s3:::test-vpc1235",
+      "Principal": {
+        "AWS": [
+          "ec2"
+        ]
+      }
+    }
+  ]
+}
