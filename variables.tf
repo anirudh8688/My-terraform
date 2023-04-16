@@ -19,3 +19,12 @@ variable "egress_to_port" {
 variable "egress_protocol" {
   type = string
 }
+variable "ami" {
+  type = string
+}
+variable "vpc_security_group_ids" {
+  type = list(string)
+}
+variable "instance_type" {
+  type = string
+}
