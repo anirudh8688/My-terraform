@@ -49,3 +49,64 @@ resource "aws_iam_user" "users" {
     Team       = each.value.team
   }
 }
+
+
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+variable "instance_object" {
+  description = "List of EC2 instances with metadata"
+  type = list(object({
+    name          = string
+    instance_type = string
+    env           = string
+  }))
+  default = [
+    {
+      name          = "web-server-1"
+      instance_type = "t2.micro"
+      env           = "dev"
+    },
+    {
+      name          = "app-server-1"
+      instance_type = "t3.micro"
+      env           = "staging"
+    },
+    {
+      name          = "db-server-1"
+      instance_type = "t3.small"
+      env           = "prod"
+    }
+  ]
+}
+
+resource "aws_instance" "by_object" {
+  for_each = { for inst in var.instance_object : inst.name => inst }
+
+  ami           = "ami-0b08bfc6ff7069aff"  # Amazon Linux AMI (change to your region-specific one)
+  instance_type = each.value.instance_type
+  subnet_id     = aws_subnet.default.id   # Example usage, optional
+  key_name      = "my-key-pair"           # Optional
+
+  tags = {
+    Name = each.key
+    Env  = each.value.env
+  }
+}
+
+resource "aws_vpc" "default" {
+  cidr_block = "10.0.0.0/16"
+  tags = {
+    Name = "example-vpc"
+  }
+}
+
+resource "aws_subnet" "default" {
+  vpc_id                  = aws_vpc.default.id
+  cidr_block              = "10.0.1.0/24"
+  availability_zone       = "us-east-1a"
+  map_public_ip_on_launch = true
+
+  tags = {
+    Name = "example-subnet"
+  }
+}
