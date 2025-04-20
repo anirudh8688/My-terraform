@@ -1,0 +1,51 @@
+toset() ensures the list is converted to a set, which is required by for_each (because for_each only accepts maps or sets of strings).
+
+If you're dealing with more complex values (like objects), you may want to use a map instead.
+
+============================
+Example1 with usernames
+variable "usernames" {
+  description = "List of IAM user names to create"
+  type        = list(string)
+  default     = ["alice", "bob", "charlie"]
+}
+
+resource "aws_iam_user" "users" {
+  for_each = toset(var.usernames)
+
+  name = each.key
+}
+================================
+
+variable "users" {
+  description = "IAM users and their tags"
+  type = map(object({
+    department = string
+    team       = string
+  }))
+  default = {
+    alice = {
+      department = "Engineering"
+      team       = "Backend"
+    },
+    bob = {
+      department = "Marketing"
+      team       = "SEO"
+    },
+    charlie = {
+      department = "Engineering"
+      team       = "Frontend"
+    }
+  }
+}
+
+resource "aws_iam_user" "users" {
+  for_each = var.users
+
+  name = each.key
+
+  tags = {
+    Department = each.value.department
+    Team       = each.value.team
+  }
+}
